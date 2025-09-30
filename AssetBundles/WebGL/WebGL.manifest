@@ -1,0 +1,10 @@
+ManifestFileVersion: 0
+CRC: 1174488423
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: new_door_2
+      Dependencies: {}
+    Info_1:
+      Name: floorplan_2
+      Dependencies: {}
