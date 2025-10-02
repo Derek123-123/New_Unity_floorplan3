@@ -67,6 +67,10 @@ public class DropdownPopulator : MonoBehaviour
         else if (selectedText.Contains("Desk")){
             itemScale = 0.20f;
         }
+        else
+        {
+            itemScale = 0.2f;
+        }
 
 
     }

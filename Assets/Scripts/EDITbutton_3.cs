@@ -173,8 +173,10 @@ public class EditButton : MonoBehaviour
         string selectedKey = item_drop_script.selectedText;
         if (string.IsNullOrEmpty(selectedKey))
         {
+            Debug.Log("nothing is selected in the Dropdown");
             return;
         }
+        
 
         if (newPrefab == null || saveName != selectedKey)
         {

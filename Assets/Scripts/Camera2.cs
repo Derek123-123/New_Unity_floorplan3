@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Camera2 : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public class Camera2 : MonoBehaviour
     public float floorHeight = 0;
     public float floorWidth = 0;
 
+    private float initialDistance;
+    private float currentDistance;
+    private bool both_touch = false;
+
 
 
     void OnEnable()
@@ -24,7 +29,8 @@ public class Camera2 : MonoBehaviour
         TryInit();
     }
 
-     public void TryInit(){
+    public void TryInit()
+    {
         if (target == null)
         {
             Debug.LogWarning("[Camera2::TryInit] target is null (waiting for injection).");
@@ -133,9 +139,10 @@ public class Camera2 : MonoBehaviour
         
     }*/
 
-    void Handle_input(float x, float z) {
-        last_x -= x* sensitivity;
-        last_z -= z* sensitivity;
+    void Handle_input(float x, float z)
+    {
+        last_x -= x * sensitivity;
+        last_z -= z * sensitivity;
         transform.position = new Vector3(last_x, radius, last_z);
     }
 
@@ -149,8 +156,10 @@ public class Camera2 : MonoBehaviour
     {
         if (target == null || editButton == null) return;
         bool edit = editButton.editMode;
-        if (Input.GetMouseButton(0)) {
-            if (!edit) { 
+        if (Input.GetMouseButton(0) && !IsPointerOverUI() && both_touch == false)
+        {
+            if (!edit)
+            {
                 float m_x = Input.GetAxis("Mouse X");
                 float m_y = Input.GetAxis("Mouse Y");
                 Handle_input(m_x, m_y);
@@ -161,11 +170,11 @@ public class Camera2 : MonoBehaviour
                 float m_y = 0;
                 Handle_input(m_x, m_y);
             }
-            
 
-            
+
+
         }
-        else if (Input.mouseScrollDelta.y > 0 )
+        else if (Input.mouseScrollDelta.y > 0 && !IsPointerOverUI())
         {
             if (radius > 1 && !edit)
             {
@@ -174,7 +183,7 @@ public class Camera2 : MonoBehaviour
 
             Handle_input(0, 0);
         }
-        else if (Input.mouseScrollDelta.y < 0 && !edit)
+        else if (Input.mouseScrollDelta.y < 0 && !edit && !IsPointerOverUI())
         {
             if (radius <= Mathf.Max(floorWidth, floorHeight) * 5 && !edit)
             {
@@ -184,5 +193,63 @@ public class Camera2 : MonoBehaviour
             Handle_input(0, 0);
         }
 
+        if (Input.touchCount == 2 && !edit && !IsPointerOverUI())
+        {
+            both_touch = true;
+            Touch touch1 = Input.GetTouch(0);
+            Touch touch2 = Input.GetTouch(1);
+            if (touch1.phase == TouchPhase.Began && touch2.phase == TouchPhase.Began)
+            {
+                initialDistance = Vector2.Distance(touch1.position, touch2.position);
+            }
+            else if (touch1.phase == TouchPhase.Moved && touch2.phase == TouchPhase.Moved)
+            {
+                currentDistance = Vector2.Distance(touch1.position, touch2.position);
+                if (currentDistance > initialDistance)
+                {
+                    if (radius > 1)
+                    {
+                        radius--;
+                    }
+                    Handle_input(0, 0);
+                }
+                else if (currentDistance < initialDistance)
+                {
+                    if (radius <= Mathf.Max(floorWidth, floorHeight) * 5)
+                    {
+                        radius++;
+                    }
+
+                    Handle_input(0, 0);
+                }
+
+                initialDistance = currentDistance;
+
+            }
+            else if (touch1.phase == TouchPhase.Ended || touch2.phase == TouchPhase.Ended)
+            {
+                Invoke("Delay", 0.2f);
+            }
+
+        }
+
+    }
+    private void Delay()
+    {
+        both_touch = false;
+    }
+
+    private bool IsPointerOverUI()
+    {
+        // Check if touch/mouse is over a UI element
+        if (EventSystem.current != null)
+        {
+            PointerEventData eventData = new PointerEventData(EventSystem.current);
+            eventData.position = Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
+            var results = new System.Collections.Generic.List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+            return results.Count > 0;
+        }
+        return false;
     }
 }
