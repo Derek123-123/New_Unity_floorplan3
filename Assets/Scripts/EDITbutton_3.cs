@@ -180,7 +180,7 @@ public class EditButton : MonoBehaviour
 
         if (newPrefab == null || saveName != selectedKey)
         {
-            var loaded = Resources.Load<GameObject>(selectedKey);
+            var loaded = Resources.Load<GameObject>("item/"+selectedKey);
             if (loaded == null)
             {
                 Debug.LogError($"[EditButton] Resources.Load failed key='{selectedKey}'. Make sure prefab sits in Assets/Resources and name matches case.");
@@ -810,7 +810,7 @@ public class EditButton : MonoBehaviour
         foreach (var cubeData in saveData.cubes)
         {
             string prefabName = string.IsNullOrEmpty(cubeData.prefabName) ? "ch1" : cubeData.prefabName;
-            GameObject prefabToLoad = Resources.Load<GameObject>(prefabName);
+            GameObject prefabToLoad = Resources.Load<GameObject>("item/" + prefabName);
             if (prefabToLoad == null)
             {
                 Debug.LogWarning($"[EditButton::LoadItem] prefab '{prefabName}' not found, skip.");

@@ -35,7 +35,7 @@ public class DropdownPopulator : MonoBehaviour
         // Clear existing options
         ItemList.options.Clear();
 
-        var prefabs = Resources.LoadAll<GameObject>("");
+        var prefabs = Resources.LoadAll<GameObject>("item");
         var prefabNames = new List<string>(prefabs.Length);
         foreach (var p in prefabs) prefabNames.Add(p.name);
         ItemList.AddOptions(prefabNames);

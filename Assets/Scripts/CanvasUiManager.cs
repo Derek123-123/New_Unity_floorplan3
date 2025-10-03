@@ -69,6 +69,18 @@ public class CanvasUiManager : MonoBehaviour
             Debug.LogError("[Probe] Walkmode reset block threw: " + ex);
         }
 
+        try
+        {
+            var Wall_M = FindObjectOfType<wallSelector>(true);
+            if (Wall_M != null) Wall_M.WMSetLoaded(false, null);
+
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("[Probe] WM reset block threw: " + ex);
+        }
+
+
     }
 
     public void OnLoadSucceeded(string bundleName, string prefabName, string instanceId, string modelId, GameObject instance)
@@ -209,6 +221,26 @@ public class CanvasUiManager : MonoBehaviour
         {
             Debug.LogError("[Probe] Walk Button inject block threw: " + ex);
         }
+
+        try
+        {
+            var Wall_M = FindObjectOfType<wallSelector>(true);
+            if (Wall_M != null)
+            {
+                Debug.Log("Now Calling MS.SetLoaded");
+                Wall_M.WMSetLoaded(true, instance);
+                //if (MS.Camera2 == null) walk.Camera2 = camera2GO;
+                //if (MS.MainCamera == null) walk.MainCamera = GameObject.Find("MainCamera");
+
+
+
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("[Probe] Walk Button inject block threw: " + ex);
+        }
+
         PrintState("OnLoadSucceeded-END");
         Debug.Log($"[OnLoadSucceeded] editButton cameras injected: C1={(switchComp?.Camera1 ? switchComp.Camera1.name : "null")} C2={(camera2GO ? camera2GO.name : "null")}");
         editButton.SelectModelAndReload(modelId);
@@ -237,6 +269,17 @@ public class CanvasUiManager : MonoBehaviour
         {
             Debug.LogError("[Probe] Walkmode reset block threw: " + ex);
         }
+
+        try
+        {
+            var Wall_M = FindObjectOfType<wallSelector>(true);
+            if (Wall_M != null) Wall_M.WMSetLoaded(false, null);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError("[Probe] WM reset block threw: " + ex);
+        }
+
 
     }
 

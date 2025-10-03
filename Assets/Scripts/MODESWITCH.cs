@@ -22,6 +22,7 @@ public class MODESWITCH : MonoBehaviour
     public GameObject Button4;
     public GameObject Button5;
     public GameObject Dropdown;
+    public GameObject wallDropdown;
     public GameObject Joystick;
     public GameObject HeightSlider;
     public GameObject AngleSlider;
@@ -164,7 +165,8 @@ public class MODESWITCH : MonoBehaviour
         SetActiveIf(Button4, false);
         SetActiveIf(Button5, false);
         SetActiveIf(Dropdown, false);
-        
+        SetActiveIf(wallDropdown, false);
+
         SetActiveIf(Joystick, true);
         SetActiveIf(HeightSlider, true);
         SetActiveIf(AngleSlider, true);
@@ -179,6 +181,8 @@ public class MODESWITCH : MonoBehaviour
         SetActiveIf(Button4, true);
         SetActiveIf(Button5, true);
         SetActiveIf(Dropdown, true);
+        SetActiveIf(wallDropdown, true);
+
 
         SetActiveIf(Joystick, false);
         SetActiveIf(HeightSlider, false);
