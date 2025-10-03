@@ -12,6 +12,9 @@ public class wallSelector : MonoBehaviour
 
     private bool loaded;
     private GameObject loadedObject;
+    private int defaultIndex;
+
+    private string defaultWallSkin = "wall-deafault";
     // Start is called before the first frame update
 
     void Start()
@@ -28,6 +31,8 @@ public class wallSelector : MonoBehaviour
         wallselector.RefreshShownValue();
 
         wallselector.onValueChanged.AddListener(changeWallMaterial);
+        defaultIndex = wallselector.options.FindIndex(option => option.text == defaultWallSkin);
+        wallselector.value = defaultIndex;
     }
 
     // Update is called once per frame
@@ -46,6 +51,7 @@ public class wallSelector : MonoBehaviour
         if (!loaded)
         {
             wallselector.interactable = isLoaded;
+            wallselector.value = defaultIndex;
         }
         else
         {

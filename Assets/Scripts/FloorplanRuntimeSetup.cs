@@ -76,26 +76,27 @@ public static class FloorplanRuntimeSetup
 
                 var bounds = floorR.bounds;
                 Vector3 targetPos = bounds.center;
-                float floorTopY = child.position.y;
+                
                 var light = child.GetComponent<Light>();
                 if (light == null) {
                     light = child.gameObject.AddComponent<Light>();
                 }
                 light.type = LightType.Directional;
-                child.position = targetPos + Vector3.up * (floorTopY + 5f);
-                child.rotation = Quaternion.Euler(12f, 35f, 0f);
+                child.position = targetPos + Vector3.up * 5f;
+                child.rotation = Quaternion.Euler(35f, 30f, 0f);
 
-                light.color = new Color(1.0f,0.67f,0.35f);
-                light.intensity = 1.0f;
+                light.color = Color.white;
+                light.intensity = 0.9f;
+
                 light.shadows = LightShadows.Soft;
-                light.shadowResolution = UnityEngine.Rendering.LightShadowResolution.Medium;
-                light.shadowStrength = 0.55f;
-                light.shadowBias = 0.04f;
-                light.shadowNormalBias = 0.35f;
+                light.shadowResolution = UnityEngine.Rendering.LightShadowResolution.High;
+                light.shadowStrength = 0.7f;
+                light.shadowBias = 0.05f;
+                light.shadowNormalBias = 0.4f;
 
                 var bo = light.bakingOutput;
                 bo.isBaked = false; // Unity manages this; set by bake. Keep false at runtime.
-                bo.lightmapBakeType = LightmapBakeType.Baked; // or Mixed, Realtime
+                bo.lightmapBakeType = LightmapBakeType.Realtime; // or Mixed, Realtime
                 light.bakingOutput = bo;
 
                 if (light.type == LightType.Point)
@@ -109,15 +110,14 @@ public static class FloorplanRuntimeSetup
                 }
 
                 RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-                RenderSettings.ambientLight = new Color(0.62f, 0.54f, 0.48f, 1f);
+                RenderSettings.ambientLight = new Color(0.62f, 0.65f, 0.65f, 1f);
                 RenderSettings.ambientIntensity = 1f;
 
                 RenderSettings.fog = true;
                 RenderSettings.fogMode = FogMode.Exponential;
-                RenderSettings.fogColor = new Color(0.85f, 0.63f, 0.53f, 1f); // warm haze
-                RenderSettings.fogDensity = 0.006f; // 0.004–0.01 depending on scale
+                
 
-                QualitySettings.shadowDistance = 30f;
+                QualitySettings.shadowDistance = 45f;
 
             }
 
