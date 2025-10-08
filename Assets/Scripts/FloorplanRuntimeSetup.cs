@@ -17,7 +17,7 @@ public static class FloorplanRuntimeSetup
             var mcRoot = root.AddComponent<MeshCollider>();
             mcRoot.convex = false;
         }
-
+        
         // Camera -> Camera1 + camera_drag�����������C����
         foreach (var t in root.GetComponentsInChildren<Transform>(true))
         {
@@ -122,12 +122,22 @@ public static class FloorplanRuntimeSetup
             }
 
 
-            if (n.Equals("Floor", StringComparison.OrdinalIgnoreCase) || n.IndexOf("floor", StringComparison.OrdinalIgnoreCase) >= 0) continue;
+            if (n.Equals("Floor", StringComparison.OrdinalIgnoreCase) || n.IndexOf("floor", StringComparison.OrdinalIgnoreCase) >= 0) { 
+                if (child.GetComponent<reSetPos>() == null)
+                {
+                    child.gameObject.AddComponent<reSetPos>();
+                }
+            }
 
             bool isWall = n.StartsWith("Wall", StringComparison.OrdinalIgnoreCase);
             bool isWindow = n.StartsWith("Window", StringComparison.OrdinalIgnoreCase);
-            if (isWall || isWindow)
+            bool isDoor = n.StartsWith("Door", StringComparison.OrdinalIgnoreCase);
+            if (isWall || isWindow || isDoor)
             {
+                if (child.GetComponent<reSetPos>() == null)
+                {
+                    child.gameObject.AddComponent<reSetPos>();
+                }
                 EnsureMeshCollider(child.gameObject);
                 // Optional: assign layers if needed for filtering
                 // int wallLayer = LayerMask.NameToLayer("WallLayer");

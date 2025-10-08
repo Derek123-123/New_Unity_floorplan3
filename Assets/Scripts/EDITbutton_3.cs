@@ -1422,7 +1422,7 @@ public class EditButton : MonoBehaviour
                     other, other.transform.position, other.transform.rotation,
                     out dir, out dist
                 );
-                if (overlapped && dist > 1e-4f)
+                if (overlapped )//&& dist > 1e-4f
                 {
                     hitCol = other;
                     Debug.Log("Hit other");
