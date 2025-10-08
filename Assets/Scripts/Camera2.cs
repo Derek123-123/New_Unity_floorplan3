@@ -53,6 +53,7 @@ public class Camera2 : MonoBehaviour
         last_x = initialPosition.x;
         last_z = initialPosition.z;
         transform.LookAt(look_target);
+        //transform.rotation =  Quaternion.Euler(0, 90, 0);
         Debug.Log($"[Camera2::TryInit] initialized. floorW={floorWidth} floorH={floorHeight} look={look_target}");
     }
 
@@ -156,9 +157,10 @@ public class Camera2 : MonoBehaviour
     {
         if (target == null || editButton == null) return;
         bool edit = editButton.editMode;
+        bool move = editButton.MoveMode;
         if (Input.GetMouseButton(0) && !IsPointerOverUI() && both_touch == false)
         {
-            if (!edit)
+            if (!edit && !move)
             {
                 float m_x = Input.GetAxis("Mouse X");
                 float m_y = Input.GetAxis("Mouse Y");

@@ -186,6 +186,7 @@ public class CanvasUiManager : MonoBehaviour
             {
                 editButton.editMode = false;
                 editButton.DeleteMode = false;
+                editButton.MoveMode = false;
                 editButton.SetRegistrar(RegisterSpawnedGO);
                 editButton.SetCameras(switchComp?.Camera1, camera2GO);
                 Debug.Log("[Probe] Before EditButton.SetWall()");

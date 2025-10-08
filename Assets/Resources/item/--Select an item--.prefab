@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8767537553117683253}
   m_Layer: 0
-  m_Name: --Please select an item--
+  m_Name: --Select an item--
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
