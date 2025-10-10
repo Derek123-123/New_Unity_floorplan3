@@ -232,9 +232,6 @@ public class CanvasUiManager : MonoBehaviour
                 Wall_M.WMSetLoaded(true, instance);
                 //if (MS.Camera2 == null) walk.Camera2 = camera2GO;
                 //if (MS.MainCamera == null) walk.MainCamera = GameObject.Find("MainCamera");
-
-
-
             }
         }
         catch (System.Exception ex)
@@ -245,6 +242,8 @@ public class CanvasUiManager : MonoBehaviour
         PrintState("OnLoadSucceeded-END");
         Debug.Log($"[OnLoadSucceeded] editButton cameras injected: C1={(switchComp?.Camera1 ? switchComp.Camera1.name : "null")} C2={(camera2GO ? camera2GO.name : "null")}");
         editButton.SelectModelAndReload(modelId);
+        Debug.Log("[CUM] the loaded meta shows wallIndex is " + editButton.Data.wallIndex);
+        
     }
 
 

@@ -21,6 +21,7 @@ public class MODESWITCH : MonoBehaviour
     public GameObject Button3;
     public GameObject Button4;
     public GameObject Button5;
+    public GameObject Button6;
     public GameObject Dropdown;
     public GameObject wallDropdown;
     public GameObject Joystick;
@@ -164,6 +165,7 @@ public class MODESWITCH : MonoBehaviour
         SetActiveIf(Button3, false);
         SetActiveIf(Button4, false);
         SetActiveIf(Button5, false);
+        SetActiveIf(Button6, false);
         SetActiveIf(Dropdown, false);
         SetActiveIf(wallDropdown, false);
 
@@ -180,6 +182,7 @@ public class MODESWITCH : MonoBehaviour
         SetActiveIf(Button3, true);
         SetActiveIf(Button4, true);
         SetActiveIf(Button5, true);
+        SetActiveIf(Button6, true);
         SetActiveIf(Dropdown, true);
         SetActiveIf(wallDropdown, true);
 

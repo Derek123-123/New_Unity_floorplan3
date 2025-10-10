@@ -125,7 +125,7 @@ public static class FloorplanRuntimeSetup
             if (n.Equals("Floor", StringComparison.OrdinalIgnoreCase) || n.IndexOf("floor", StringComparison.OrdinalIgnoreCase) >= 0) { 
                 if (child.GetComponent<reSetPos>() == null)
                 {
-                    child.gameObject.AddComponent<reSetPos>();
+                    //child.gameObject.AddComponent<reSetPos>();
                 }
             }
 
@@ -134,9 +134,10 @@ public static class FloorplanRuntimeSetup
             bool isDoor = n.StartsWith("Door", StringComparison.OrdinalIgnoreCase);
             if (isWall || isWindow || isDoor)
             {
+                
                 if (child.GetComponent<reSetPos>() == null)
                 {
-                    child.gameObject.AddComponent<reSetPos>();
+                    //child.gameObject.AddComponent<reSetPos>();
                 }
                 EnsureMeshCollider(child.gameObject);
                 // Optional: assign layers if needed for filtering
@@ -153,6 +154,15 @@ public static class FloorplanRuntimeSetup
         if (col == null)
         {
             col = go.AddComponent<MeshCollider>();
+        }
+        if (col != null) {
+            Debug.Log(go.name + " has a MeshCollider");
+        }
+        Component[] allComponents = go.GetComponents<Component>();
+        Debug.Log("Components on " + go.name + ":");
+        foreach (Component component in allComponents)
+        {
+            Debug.Log("- " + component.GetType().Name);
         }
         col.convex = false; // static, non-convex for accurate geometry
     }

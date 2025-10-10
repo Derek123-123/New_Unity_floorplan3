@@ -10,14 +10,18 @@ public class wallSelector : MonoBehaviour
     public TMP_Dropdown wallselector;
     public string folderPath = "Assets/wallMaterial";
 
+    public EditButton editButton;
+    
     private bool loaded;
     private GameObject loadedObject;
     private int defaultIndex;
-
-    private string defaultWallSkin = "wall-deafault";
+    //public int selectedIndex = -1;
+    private string defaultWallSkin = "wall-default";
     // Start is called before the first frame update
 
-    void Start()
+    public bool Wallchanged = false;
+
+    void Awake()
     {
         wallselector = GetComponent<TMP_Dropdown>();
         wallselector.ClearOptions();
@@ -31,27 +35,41 @@ public class wallSelector : MonoBehaviour
         wallselector.RefreshShownValue();
 
         wallselector.onValueChanged.AddListener(changeWallMaterial);
+        wallselector.onValueChanged.AddListener(changed);
+        Wallchanged = false;
         defaultIndex = wallselector.options.FindIndex(option => option.text == defaultWallSkin);
         wallselector.value = defaultIndex;
+
+        if (Wallchanged) Debug.Log("[Awake] Wallchanged is true");
+        else Debug.Log("[Awake] Wallchange is false");
+
+
+
+
+
+    }
+
+    void Start()
+    {
+        Wallchanged = false;
+        if (Wallchanged) Debug.Log("[Start] Wallchanged is true");
+        else Debug.Log("[Start] Wallchange is false");
+
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        wallselector.interactable = editButton.editMode;
     }
 
     public void WMSetLoaded(bool isLoaded, GameObject Go)
     {
         loaded = isLoaded;
-        if (wallselector != null)
-        {
-            wallselector.interactable = isLoaded;
-        }
         if (!loaded)
         {
-            wallselector.interactable = isLoaded;
-            wallselector.value = defaultIndex;
+            wallselector.interactable = false ;
+            
         }
         else
         {
@@ -61,6 +79,7 @@ public class wallSelector : MonoBehaviour
 
     public void changeWallMaterial(int index)
     {
+        //selectedIndex = index;
         Debug.Log("go in changeWallMaterial");
         if (wallselector == null || index < 0 || index >= wallselector.options.Count) return;
         string selectedText = wallselector.options[index].text;
@@ -68,9 +87,7 @@ public class wallSelector : MonoBehaviour
         if (loaded && Material_wall != null)
         {
 
-            Shader standard = Shader.Find("Standard");
-            var debugMat = new Material(standard);
-            debugMat.color = Color.magenta; // flat color
+            var standard = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
             if (standard == null)
             {
                 Debug.LogError("Shader 'Standard' not found. Make sure you are using the Built-in Render Pipeline.");
@@ -112,14 +129,7 @@ public class wallSelector : MonoBehaviour
                             if (rend != null)
                             {
                                 rend.material = Material_wall;
-                                /*var mats = rend.sharedMaterials; // use shared to avoid instancing explosion
-                                for (int i = 0; i < mats.Length; i++)
-                                {
-                                    mats[i] = Material_wall;
-                                }
-                                   
-                                rend.sharedMaterials = mats;
-                                SetTilingPerRenderer(rend, tiling, offset);*/
+                                
                             }
                             Debug.Log("changed "+child.name +" Material!!");
                         }
@@ -130,22 +140,17 @@ public class wallSelector : MonoBehaviour
                     }
 
                 }
-            }
 
-            GameObject CubeTest = GameObject.Find("Cube");
-            if (CubeTest != null)
-            {
-                var rendC = CubeTest.GetComponent<MeshRenderer>();
-                if (rendC != null)
-                {
-                    
-                    rendC.material = debugMat;
 
-                    // 这里调用，保证 Cube 的贴图缩放与墙体一致
-                    //SetTilingPerRenderer(rendC, tiling, offset);
-                }
+                editButton.Data.wallIndex = index;
+                Debug.Log("Saved wallIndex: " + editButton.Data.wallIndex);
+               
+
+
 
             }
+
+            
 
         }
         else
@@ -154,27 +159,12 @@ public class wallSelector : MonoBehaviour
         }
     }
 
-    void SetTilingPerRenderer(MeshRenderer rend, Vector2 tiling, Vector2 offset)
+    public void changed(int index)
     {
-        if (rend == null) return;
-        var mpb = new MaterialPropertyBlock();
-        rend.GetPropertyBlock(mpb);
-
-        var mat = rend.sharedMaterial;
-        if (mat != null)
-        {
-            // Built-in Standard
-            if (mat.HasProperty("_MainTex"))
-            {
-                mpb.SetVector("_MainTex_ST", new Vector4(tiling.x, tiling.y, offset.x, offset.y));
-            }
-            // URP Lit
-            if (mat.HasProperty("_BaseMap"))
-            {
-                mpb.SetVector("_BaseMap_ST", new Vector4(tiling.x, tiling.y, offset.x, offset.y));
-            }
-        }
-
-        rend.SetPropertyBlock(mpb);
+        Wallchanged = true;
     }
+
+    
+
+    
 }

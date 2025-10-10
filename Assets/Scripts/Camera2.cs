@@ -230,7 +230,7 @@ public class Camera2 : MonoBehaviour
             }
             else if (touch1.phase == TouchPhase.Ended || touch2.phase == TouchPhase.Ended)
             {
-                Invoke("Delay", 0.2f);
+                Invoke("Delay", 0.5f);
             }
 
         }

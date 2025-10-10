@@ -12,20 +12,14 @@ public class DropdownPopulator : MonoBehaviour
     public float itemScale;
     public string selectedText;
 
-    private GameObject editButton;
-    private EditButton editButton_Script;
+    
+    public EditButton editButton;
     private bool interactable;
 
 
     void Start()
     {
 
-        editButton = GameObject.Find("edit");
-        if (editButton == null) { Debug.LogError("[DropdownPopulator] 'edit' not found"); return; }
-        editButton_Script = editButton.GetComponent<EditButton>();
-        if (editButton_Script == null) { Debug.LogError("[DropdownPopulator] EditButton not found on 'edit'"); return; }
-
-        
         var go = GameObject.Find("select_ITEM");
         if (go == null) { Debug.LogError("[DropdownPopulator] 'select_ITEM' not found"); return; }
         ItemList = go.GetComponent<TMP_Dropdown>();
@@ -49,12 +43,9 @@ public class DropdownPopulator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (editButton_Script == null || ItemList == null) return;
 
-        var dd = GetComponent<TMP_Dropdown>();
-        if (dd == null) return;
 
-        dd.interactable = editButton_Script.interactableDD;
+        ItemList.interactable = editButton.editMode;
         if (ItemList.options == null || ItemList.options.Count == 0) return;
         int idx = ItemList.value;
         if (idx < 0 || idx >= ItemList.options.Count) return;
