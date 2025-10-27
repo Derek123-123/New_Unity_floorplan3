@@ -63,11 +63,7 @@ public class Switch_camera_button : MonoBehaviour
             Camera1.SetActive(true);
             MainCamera.SetActive(false);
             Camera3.SetActive(false);
-            /*if (editButton != null)
-            {
-                editButton.editMode = false;
-                editButton.DeleteMode = false;
-            }*/
+          
             editButton.SyncUiByModes();
         }
         Debug.Log($"[SwitchCam] After toggle: C1={(Camera1 ? Camera1.activeSelf : false)} C2={(Camera2 ? Camera2.activeSelf : false)}");

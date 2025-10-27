@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 using TMPro;
 
@@ -34,6 +35,10 @@ public class DropdownPopulator : MonoBehaviour
         foreach (var p in prefabs) prefabNames.Add(p.name);
         ItemList.AddOptions(prefabNames);
         ItemList.RefreshShownValue();
+
+        ItemList.itemText.fontSize = 20;
+       
+
 
         Debug.Log($"[DropdownPopulator] Loaded {prefabNames.Count} options");
 

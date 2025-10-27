@@ -49,7 +49,7 @@ public class EditButton : MonoBehaviour
     [Range(0.9f, 1f)] public float overlapShrink = 0.99f; // 稍微縮小邊界，避免邊界抖動卡住
     public bool blockRotationOnCollision = true;
 
-
+    public Button SwitchCameraBtn;
 
     private Button Save_button;
     private Button Cancel_button;
@@ -185,7 +185,6 @@ public class EditButton : MonoBehaviour
     {
         if (item_drop_script == null || camera2 == null)
         {
-            // 
             return;
         }
         string selectedKey = item_drop_script.selectedText;
@@ -219,6 +218,7 @@ public class EditButton : MonoBehaviour
         {
             if (editMode)
             {
+                SwitchCameraBtn.interactable = false;
                 //fix camera position
                 camera2.transform.position = current_pos;
 
@@ -267,6 +267,8 @@ public class EditButton : MonoBehaviour
 
                                     int cubeLayer = LayerMask.NameToLayer("CubeLayer");
                                     if (cubeLayer != -1) newCube.layer = cubeLayer;
+
+                                    Debug.Log("NewCube: " + newCube.name + " is in  Position :" + newCube.transform.position);
                                 }
                                 else
                                 {
@@ -312,16 +314,7 @@ public class EditButton : MonoBehaviour
                         int floorMask = floorLayer != -1 ? (1 << floorLayer) : ~0;
                         var hits = Physics.RaycastAll(ray, Mathf.Infinity, ~0, QueryTriggerInteraction.Ignore);
                         
-                         /*if (Physics.Raycast(ray, out var rh, Mathf.Infinity, floorMask, QueryTriggerInteraction.Ignore))
-                        {
-                            Vector3 desiredPos = new Vector3(rh.point.x, newCube.transform.position.y, rh.point.z);
-
-                            int blockingMask = ~0;
-                            if (floorLayer != -1) blockingMask &= ~(1 << floorLayer);
-
-                            // Iterative slide with up to 3 BoxCast steps this frame
-                            TryMoveSlideIterative(newCube.transform, desiredPos, blockingMask, skin: 0.01f, maxIters: 3);
-                        }*/
+                         
                        if (hits.Length == 0) { Debug.Log("RaycastAll: 0 hits"); }
                         else
                         {
@@ -369,7 +362,7 @@ public class EditButton : MonoBehaviour
                         Bounds bounds = moverCol.bounds;
                         Vector3 centerOffset = bounds.center - newCube.transform.position;
                         Vector3 desiredCenter = new Vector3(targetPos.x + centerOffset.x, bounds.center.y+0.005f, targetPos.z + centerOffset.z);
-                        Vector3 halfExtents = bounds.extents * 1.02f;
+                        Vector3 halfExtents = bounds.extents * 1.05f;
 
                         Collider[] overlaps = Physics.OverlapBox(
                            desiredCenter,
@@ -404,7 +397,7 @@ public class EditButton : MonoBehaviour
                         }
                         else
                         {
-                            Debug.Log("Blocked! Cannot move into other object.");
+                            Debug.Log("Blocked!!!");
                         }
                     }
                 }
@@ -474,6 +467,7 @@ public class EditButton : MonoBehaviour
             {
                 newCube = null;
                 touch_count = 0;
+                SwitchCameraBtn.interactable = true;
                 if (DeleteMode)
                 {
                     if (Input.GetMouseButtonDown(0) && !IsPointerOverUI())
@@ -531,100 +525,6 @@ public class EditButton : MonoBehaviour
                     }
                     if (hasMoveSelection && Input.GetMouseButton(0) && !IsPointerOverUI())
                     {
-                        /*Ray ray = camera2.ScreenPointToRay(Input.mousePosition);
-                        
-                        int floorLayer = LayerMask.NameToLayer("FloorLayer");
-                        
-                        var hits = Physics.RaycastAll(ray, Mathf.Infinity, ~0, QueryTriggerInteraction.Ignore);
-                     
-                        if (hits != null && hits.Length > 0)
-                        {
-                            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-                            Vector3? targetPos = null;
-                            foreach (var h in hits)
-                            {
-                                var goH = h.collider.gameObject;
-                                bool isFloor = (floorLayer != -1 && goH.layer == floorLayer) || goH.name == "Floor";
-                                
-                                if (isFloor)
-                                {
-                                    targetPos = new Vector3(h.point.x, SelectedMoveItem.transform.position.y, h.point.z);
-                                    break;
-                                }
-
-                            }
-                            if (targetPos.HasValue)
-                            {
-                                Quaternion targetRot = SelectedMoveItem.transform.rotation;
-                                int blockingMask = ~0; // 依需要過濾；可排除 FloorLayer
-                                
-                                if (floorLayer != -1)
-                                {
-                                    int floorMask = 1 << floorLayer;
-                                    blockingMask &= ~floorMask;
-                                }
-
-                                if (CanPlaceAt(SelectedMoveItem.transform, new Vector3(targetPos.Value.x, SelectedMoveItem.transform.position.y, targetPos.Value.z), targetRot, blockingMask, out var hit))
-                                {
-                                    SelectedMoveItem.transform.position = new Vector3(targetPos.Value.x, SelectedMoveItem.transform.position.y, targetPos.Value.z);
-                                }
-                                else
-                                {
-                                    Debug.Log($"Blocked by {hit?.name}");
-                                }
-
-
-                                /*var moverCol = SelectedMoveItem.GetComponent<Collider>();
-                                if (moverCol!= null)
-                                {
-                                    Bounds b = moverCol.bounds;
-                                    Vector3 CenterOffset = b.center - SelectedMoveItem.transform.position;
-                                    Vector3 desiredCenter = targetPos.Value + CenterOffset;
-                                    Vector3 halfEctents = b.extents * 0.95f;
-                                    var overlaps = Physics.OverlapBox(
-                                        desiredCenter,
-                                        halfEctents,
-                                        SelectedMoveItem.transform.rotation,
-                                        ~0,
-                                        QueryTriggerInteraction.Ignore
-                                        );
-                                    bool blocked = false;
-                                    foreach (var col in overlaps)
-                                    {
-                                        if (!col) continue;
-                                        if (col.transform == SelectedMoveItem.transform) continue;
-                                        bool colIsFloor = (floorLayer != -1 && col.gameObject.layer == floorLayer) || col.gameObject.name == "Floor";
-                                        if (colIsFloor) continue;
-
-                                        blocked = true;
-                                        break;
-                                    }
-                                    if (!blocked)
-                                    {
-                                        SelectedMoveItem.transform.position = targetPos.Value;
-                                    }
-                                }
-                            }*/
-                        /*
-                                               if (Input.GetMouseButton(0))
-                                               {
-                                                   int floorLayer = LayerMask.NameToLayer("FloorLayer");
-                                                   int floorMask = floorLayer != -1 ? (1 << floorLayer) : ~0;
-                                                   Ray ray = camera2.ScreenPointToRay(Input.mousePosition);
-                                                   if (Physics.Raycast(ray, out var rh, Mathf.Infinity, floorMask, QueryTriggerInteraction.Ignore))
-                                                   {
-                                                       // Keep Y of item; solver will handle collisions and sliding
-                                                       //moveTarget = new Vector3(rh.point.x, SelectedMoveItem.transform.position.y, rh.point.z);
-                                                   }
-
-                                                   if (Input.GetMouseButtonUp(0))
-                                                   {
-                                                       // Do not stop physics yet; allow Save/Cancel to decide
-                                                   }
-                                               }
-                                              */
-
-
 
                         if (SelectedMoveItem == null)
                         {
@@ -656,7 +556,7 @@ public class EditButton : MonoBehaviour
                         }
                         if (!gotTarget) return;
                         int blockingMask = ~0;
-                        //if (floorLayer != -1) blockingMask &= ~(1 << floorLayer);
+                        if (floorLayer != -1) blockingMask &= ~(1 << floorLayer);
                         Vector3 desiredPos = new Vector3(MtargetPos.x, SelectedMoveItem.transform.position.y, MtargetPos.z);
                         Quaternion desiredRot = SelectedMoveItem.transform.rotation;
 
@@ -668,52 +568,106 @@ public class EditButton : MonoBehaviour
                         {
                             Debug.Log($"[MoveMode] Blocked by {hit?.name}");
                         }
-                        /*
 
-                        int floorLayer = LayerMask.NameToLayer("FloorLayer");
-                        int floorMask = floorLayer != -1 ? (1 << floorLayer) : ~0;
-                        Ray ray = camera2.ScreenPointToRay(Input.mousePosition);
 
-                        if(Physics.Raycast(ray, out var rh,Mathf.Infinity, floorMask, QueryTriggerInteraction.Ignore))
+                        /*if (SelectedMoveItem != null)
                         {
-                            Vector3 desiredPos = new Vector3(rh.point.x, SelectedMoveItem.transform.position.y, rh.point.z);
-                            int blockingMask = ~0;
-                            if (floorLayer != -1) blockingMask &= ~(1 << floorLayer);
+                            Ray ray = camera2.ScreenPointToRay(Input.mousePosition);
+                            Vector3 targetPos = default;
+                            bool gotTarget = false;
+                            int floorLayer = LayerMask.NameToLayer("FloorLayer");
+                            int floorMask = floorLayer != -1 ? (1 << floorLayer) : ~0;
+                            var hits = Physics.RaycastAll(ray, Mathf.Infinity, ~0, QueryTriggerInteraction.Ignore);
 
-                            TryMoveSlideIterative(SelectedMoveItem.transform, desiredPos, blockingMask, skin: 0.01f, maxIters: 3);
 
+                            if (hits.Length == 0) { Debug.Log("RaycastAll: 0 hits"); }
+                            else
+                            {
+                                Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+                                foreach (var h in hits)
+                                {
+                                    Debug.Log($"RaycastAll hit -> {h.collider.gameObject.name} layer={h.collider.gameObject.layer} dist={h.distance}");
+                                }
+                            }
+                            if (hits != null && hits.Length > 0)
+                            {
+                                Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+                                foreach (var h in hits)
+                                {
+                                    var goH = h.collider.gameObject;
+                                    bool isFloor = (floorLayer != -1 && goH.layer == floorLayer) || goH.name == "Floor";
+                                    if (isFloor)
+                                    {
+                                        targetPos = new Vector3(h.point.x, h.point.y + 0.005f, h.point.z);
+                                        gotTarget = true;
+                                        break;
+                                    }
+
+                                }
+                            }
+
+                            if (!gotTarget) return;
+
+                            Collider moverCol = SelectedMoveItem.GetComponent<Collider>();
+                            if (moverCol == null) return;
+
+                            Bounds bounds = moverCol.bounds;
+
+                            //bounds.Expand(-10f);
+
+                            Vector3 centerOffset = bounds.center - SelectedMoveItem.transform.position;
+                            Vector3 desiredCenter = new Vector3(targetPos.x + centerOffset.x, bounds.center.y + 0.005f, targetPos.z + centerOffset.z);
+                            Vector3 halfExtents = bounds.extents * 1.02f;
+
+                            Collider[] overlaps = Physics.OverlapBox(
+                               desiredCenter,
+                               halfExtents,
+                               SelectedMoveItem.transform.rotation,
+                               ~0,
+                               QueryTriggerInteraction.Ignore
+                            );
+
+                            bool blocked = false;
+                            foreach (var col in overlaps)
+                            {
+                                if (col == null) continue;
+                                if (col.transform == SelectedMoveItem.transform) continue;
+
+
+                                bool colIsFloor =
+                                    (floorLayer != -1 && col.gameObject.layer == floorLayer) ||
+                                    col.gameObject.name == "Floor";
+
+                                if (colIsFloor) continue;
+
+                                blocked = true;
+                                Debug.Log("Blocked with " + col.gameObject.name);
+                                break;
+                            }
+
+                            if (!blocked)
+                            {
+                                Vector3 newPos = new Vector3(targetPos.x, SelectedMoveItem.transform.position.y, targetPos.z);
+                                SelectedMoveItem.transform.position = newPos;
+                            }
+                            else
+                            {
+                                Debug.Log("Blocked! Cannot move into other object.");
+                            }
                         }*/
+                        
+                    
 
-                        /*
-                         Ray ray = camera2.ScreenPointToRay(Input.mousePosition);
-                         int floorLayer = LayerMask.NameToLayer("FloorLayer");
-                         var hits = Physics.RaycastAll(ray, Mathf.Infinity, ~0, QueryTriggerInteraction.Ignore);
-                         if (hits != null && hits.Length > 0)
-                         {
-                             Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-                             Vector3? targetPosN = null;
-                             foreach (var h in hits)
-                             {
-                                 var goH = h.collider.gameObject;
-                                 bool isFloor = (floorLayer != -1 && goH.layer == floorLayer) || goH.name == "Floor";
-                                 if (isFloor)
-                                 {
-                                     targetPosN = new Vector3(h.point.x, SelectedMoveItem.transform.position.y, h.point.z);
-                                     break;
-                                 }
-                             }
-                             if (targetPosN.HasValue)
-                             {
-                                 Vector3 desired = targetPosN.Value;
-                                 int blockingMask = ~0;
-                                 if (floorLayer != -1) blockingMask &= ~(1 << floorLayer);
 
-                                 if (!TryMoveOnceNoSlide(SelectedMoveItem.transform, desired, blockingMask, out var why))
-                                 {
-                                     Debug.Log($"[MoveMode] Blocked: {why}");
-                                 }
-                             }
-                         }*/
+
+
+
+
+
+
+
+
+                  
 
 
                     } 
@@ -763,8 +717,12 @@ public class EditButton : MonoBehaviour
             else {
                 
                 touch_count = 0;
-                //StopMove();
+                
                 //CancelItem(newCube);
+                if (newCube != null)
+                {
+                    CancelItem(newCube);
+                }
             }
         }
         catch (System.Exception ex) { Debug.LogError("[EditButton::ToggleEditMode] exception: " + ex); }
@@ -886,110 +844,7 @@ public class EditButton : MonoBehaviour
     }
 
 
-    // the following functions are not used temporarily
-    /*private void DoSpinWithCollision(float x)
-    {
-        if (newCube == null) return;
-        if (float.IsNaN(currentYaw) || float.IsNaN(targetYaw) || (currentYaw == 0f && targetYaw == 0f))
-        {
-            currentYaw = newCube.transform.eulerAngles.y;
-            targetYaw = currentYaw;
-            yawVelocity = 0f;
-        }
-
-        float deltaYaw = x * yawDragSensitivity * Time.deltaTime;
-        float candidateTarget = targetYaw - deltaYaw;
-        float testYaw = Mathf.SmoothDampAngle(currentYaw, candidateTarget, ref yawVelocity, yawSmoothTime);
-
-        if (!WouldCollideAtYaw(testYaw))
-        {
-            targetYaw = candidateTarget;
-            currentYaw = testYaw;
-
-            var e = newCube.transform.eulerAngles;
-            e.y = currentYaw;
-            newCube.transform.eulerAngles = e;
-
-        }
-        else
-        {
-            if (blockRotationOnCollision)
-            {
-                yawVelocity = 0f;
-            }
-            else
-            {
-                if (TryFindMaxAllowedYaw(currentYaw, candidateTarget, 6, out float edgeYaw))
-                {
-                    targetYaw = currentYaw = edgeYaw;
-                    yawVelocity = 0f;
-                    var e = newCube.transform.eulerAngles;
-                    e.y = currentYaw;
-                    newCube.transform.eulerAngles = e;
-                }
-                else
-                {
-                    yawVelocity = 0f;
-                }
-            }
-        }
-    }
-    private bool WouldCollideAtYaw(float yawDeg)
-    {
-        // 取目標物的任一 Collider（支援 MeshCollider）
-        var col = newCube.GetComponentInChildren<Collider>();
-        if (col == null) return false; // 沒碰撞器就視為不會撞
-                                       // 以當前世界 AABB 估中心與半尺寸（AABB 會較保守，但足以防穿模）
-        Bounds b = col.bounds;
-        Vector3 center = b.center;
-        Vector3 halfExtents = b.extents * overlapShrink;
-
-        // 只繞 Y 旋轉
-        Quaternion rot = Quaternion.Euler(0f, yawDeg, 0f);
-
-        // 查詢所有重疊的碰撞器
-        Collider[] hits = Physics.OverlapBox(center, halfExtents, rot, collideCheckMask, QueryTriggerInteraction.Ignore);
-
-        foreach (var h in hits)
-        {
-            if (h == null) continue;
-
-            // 忽略自身（包含子節點）
-            if (IsSelfOrChild(h.transform, newCube.transform)) continue;
-
-            // 忽略地板（依你的規則）
-            if (IsFloor(h.gameObject)) continue;
-
-            // 只要有一個阻擋物就算會撞
-            return true;
-        }
-        return false;
-    }
-    private bool TryFindMaxAllowedYaw(float fromYaw, float toYaw, int iters, out float okYaw)
-    {
-        okYaw = fromYaw;
-        float lo = fromYaw, hi = toYaw;
-        // 從當前角往目標角做二分搜尋，找到最接近且不碰撞的角度
-        for (int i = 0; i < iters; i++)
-        {
-            float mid = Mathf.Lerp(lo, hi, 0.5f);
-            if (!WouldCollideAtYaw(mid))
-            {
-                okYaw = mid;
-                lo = mid;
-            }
-            else
-            {
-                hi = mid;
-            }
-        }
-        return !Mathf.Approximately(okYaw, fromYaw);
-    }
-    private static bool IsSelfOrChild(Transform t, Transform root)
-    {
-        return t == root || t.IsChildOf(root);
-    }*/
-    ///////////////////////////////
+ 
     
     // ========= New: per-user per-model API helpers =========
     private string GetModelsListUrl()
@@ -1396,7 +1251,6 @@ public class EditButton : MonoBehaviour
         if (!selfCol) return true;
         // Use current AABB as shape
         Bounds b = selfCol.bounds;
-
         // Temporarily disable all own colliders to avoid self-hits
         var myCols = mover.GetComponentsInChildren<Collider>(true);
         var reEnable = new List<Collider>();
@@ -1414,7 +1268,7 @@ public class EditButton : MonoBehaviour
             if (dist < 1e-6f) return true;
 
             Vector3 dir = delta / dist;
-            Vector3 half = b.extents * 1.02f;
+            Vector3 half = b.extents * 1.05f;
 
             if (Physics.BoxCast(from, half, dir, out var hinfo, Quaternion.identity, dist, blockingLayerMask, QueryTriggerInteraction.Ignore))
             {
@@ -1437,7 +1291,7 @@ public class EditButton : MonoBehaviour
     }
 
 
-    /*private static bool TryGetCombinedBounds(Transform root, out Bounds b)
+    private static bool TryGetCombinedBounds(Transform root, out Bounds b)
     {
         b = default;
         var cols = root.GetComponentsInChildren<Collider>(true);
@@ -1450,18 +1304,18 @@ public class EditButton : MonoBehaviour
         }
         return ok;
     }
-
+ /*
     private static void DisableSelfColliders(Transform root, List<Collider> disabled)
     {
         disabled.Clear();
         var cols = root.GetComponentsInChildren<Collider>(true);
         foreach (var c in cols) if (c && c.enabled) { c.enabled = false; disabled.Add(c); }
-    }
+    } 
     private static void ReenableColliders(List<Collider> list)
     {
         foreach (var c in list) if (c) c.enabled = true;
     }
-
+    
     private bool TryMoveSlideIterative(Transform mover, Vector3 desiredPos, int blockingMask, float skin = 0.01f, int maxIters = 3)
     {
         if (!mover) return false;
@@ -1472,12 +1326,15 @@ public class EditButton : MonoBehaviour
         try
         {
             Quaternion rot = mover.rotation;
+
+            // current AABB center and offset back to the root transform
             Vector3 centerOffset = b.center - mover.position;
             Vector3 fromCenter = b.center;
             Vector3 toCenter = new Vector3(desiredPos.x + centerOffset.x, b.center.y, desiredPos.z + centerOffset.z);
 
-            Vector3 totalDelta = toCenter - fromCenter;
-            Vector3 remaining = totalDelta;
+            Vector3 remaining = toCenter - fromCenter;
+
+            // Inflate a bit to avoid grazing false negatives
             Vector3 half = b.extents * 1.02f;
             bool fullyReached = true;
 
@@ -1490,46 +1347,44 @@ public class EditButton : MonoBehaviour
 
                 if (Physics.BoxCast(fromCenter, half, dir, out var hit, rot, dist, blockingMask, QueryTriggerInteraction.Ignore))
                 {
-                    // Move up to just before the hit
+                    // move just before the contact
                     float allowed = Mathf.Max(0f, hit.distance - skin);
-                    fromCenter = fromCenter + dir * allowed;
+                    fromCenter += dir * allowed;
 
-                    // Slide: remove the normal component from remaining
+                    // project remaining along the surface (slide)
                     Vector3 n = hit.normal;
                     Vector3 slide = remaining - Vector3.Project(remaining, n);
 
-                    // If slide is nearly zero, we’re blocked
                     if (slide.sqrMagnitude <= 1e-10f)
                     {
                         fullyReached = false;
                         break;
                     }
 
-                    // Continue with reduced remaining along slide direction
                     float leftover = Mathf.Max(0f, dist - allowed);
                     remaining = slide.normalized * leftover;
 
-                    fullyReached = false; // we didn’t reach in a straight line
+                    fullyReached = false; // didn’t reach the straight target
                 }
                 else
                 {
-                    // No hit; we can move the full remaining distance
+                    // free path
                     fromCenter += dir * dist;
                     remaining = Vector3.zero;
                     break;
                 }
             }
 
-            // Final overlap sanity check
+            // Final overlap sanity check (prevents resting interpenetration)
             var overlaps = Physics.OverlapBox(fromCenter, half, rot, blockingMask, QueryTriggerInteraction.Ignore);
-            foreach (var h in overlaps)
+            foreach (var oc in overlaps)
             {
-                if (!h || h.isTrigger) continue;
+                if (!oc || oc.isTrigger) continue;
                 fullyReached = false;
                 break;
             }
 
-            // Commit position (keep Y)
+            // commit XZ (keep current Y)
             Vector3 finalRoot = fromCenter - centerOffset;
             mover.position = new Vector3(finalRoot.x, mover.position.y, finalRoot.z);
 
@@ -1539,7 +1394,7 @@ public class EditButton : MonoBehaviour
         {
             ReenableColliders(reEnable);
         }
-        
+
     }*/
 
 

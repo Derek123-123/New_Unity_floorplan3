@@ -33,7 +33,7 @@ public class wallSelector : MonoBehaviour
         }
         wallselector.AddOptions(WMaterialNames);
         wallselector.RefreshShownValue();
-
+        wallselector.itemText.fontSize = 20;
         wallselector.onValueChanged.AddListener(changeWallMaterial);
         wallselector.onValueChanged.AddListener(changed);
         Wallchanged = false;

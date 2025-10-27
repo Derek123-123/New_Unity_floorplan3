@@ -125,7 +125,7 @@ public static class FloorplanRuntimeSetup
             if (n.Equals("Floor", StringComparison.OrdinalIgnoreCase) || n.IndexOf("floor", StringComparison.OrdinalIgnoreCase) >= 0) { 
                 if (child.GetComponent<reSetPos>() == null)
                 {
-                    //child.gameObject.AddComponent<reSetPos>();
+                    child.gameObject.AddComponent<reSetPos>();
                 }
             }
 
@@ -137,7 +137,7 @@ public static class FloorplanRuntimeSetup
                 
                 if (child.GetComponent<reSetPos>() == null)
                 {
-                    //child.gameObject.AddComponent<reSetPos>();
+                    child.gameObject.AddComponent<reSetPos>();
                 }
                 EnsureMeshCollider(child.gameObject);
                 // Optional: assign layers if needed for filtering
